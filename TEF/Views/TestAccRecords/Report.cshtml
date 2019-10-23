@@ -1,0 +1,13 @@
+﻿@model TEF.Models.TestAccRecord
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";}
+
+
+
+    <div class="card border-primary mb-3" style="max-width: 100%;">
+        <div class="card-header">Вы ответили на @ViewBag.AnsweredCorrectly из @ViewBag.MaxQ вопросов правильно и набрали следующее количество баллов - @ViewBag.Score . </div>
+    </div>
+
+

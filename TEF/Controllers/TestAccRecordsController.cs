@@ -28,12 +28,15 @@ namespace TEF.Controllers
             ViewBag.Score = 0;
             ViewBag.MaxQ = 1;
             ViewBag.Subject = subj<1 ? 1 : subj;
-            ViewBag.CurrQ = 1;
+            ViewBag.CurrQ = 0;
+            ViewBag.AnsweredCorrectly = 0;
             if (id.HasValue || id<= db.TestAccRecords.Count())
             {
 
                 //                TestAccRecord testAccRecord = db.TestAccRecords.Find(1);
-                var q = db.TestAccRecords.Where(x => x.SubjectId == 1).Select(x => x.Id).ToArray();
+                var subjKeys = db.TestsDescs.Find(subj).KeyCode;
+
+                var q = db.TestAccRecords.Where(x => x.SubjectId == subj).Select(x => x.Id).ToArray();
                 string ts = String.Join(",",q);
                 ViewBag.SubjectId = ts;
                 ViewBag.MaxQ = q.Count();
@@ -49,7 +52,9 @@ namespace TEF.Controllers
         public ActionResult RecordRnd(FormCollection collection)
         {
             int Score = Convert.ToInt16(collection["Score"]);
+            int AnsweredCorrectly = Convert.ToInt16(collection["AnsweredCorrectly"]);
             ViewBag.Score = Score;
+            ViewBag.AnsweredCorrectly = AnsweredCorrectly;
             ViewBag.MaxQ = Convert.ToInt16(collection["MaxQ"]);
             ViewBag.Subject = collection["Subject"];
             ViewBag.SubjectId = collection["SubjectId"];
@@ -59,29 +64,44 @@ namespace TEF.Controllers
             var showAll = collection["exampleRadios"];
             var ans_n = 1;
             var resans = 0;
-            int id = ts[currq];
-            foreach (var i_ans in showAll.Split(','))
+            
+            if (currq+1 <= ViewBag.MaxQ)
             {
-                if (i_ans == "true") resans = ans_n;
-                ans_n += 1;
-            }
-            if (id <= db.TestAccRecords.Count())
-            {
-                TestAccRecord testAccRecord = db.TestAccRecords.Find(id < 1 ? 1 : id);
-                   if (Convert.ToInt16(testAccRecord.CorrectAnswer) == resans)
-                    {
-                        ViewBag.Score += 1;
-                    }
-                
-
-                id += 1;
+                int id = Convert.ToInt16(ts.ToString().Split(',')[currq]);
+                foreach (var i_ans in showAll.Split(','))
+                {
+                    if (i_ans == "true") resans = ans_n;
+                    ans_n += 1;
+                }
                 if (id <= db.TestAccRecords.Count())
                 {
-                    testAccRecord = db.TestAccRecords.Find(id);
-                    ViewBag.CurrQ = id;
-                    return View(testAccRecord);
-                }                 
+                    TestAccRecord testAccRecord = db.TestAccRecords.Find(id < 1 ? 1 : id);
+                    if (Convert.ToInt16(testAccRecord.CorrectAnswer) == resans)
+                    {
+                        ViewBag.Score += 1;
+                        ViewBag.AnsweredCorrectly += 1;
+                    }
+
+
+                    id += 1;
+                    if (id <= db.TestAccRecords.Count() && id<= ViewBag.MaxQ)
+                    {
+                        testAccRecord = db.TestAccRecords.Find(id);
+                        ViewBag.CurrQ = id - 1;
+                        return View(testAccRecord);
+                    }
+                    else
+                    {
+                      View("Report");
+                    }
+                       
+                }
             }
+            return View("Report");
+        }
+        public ActionResult Report()
+        {
+            
             return View();
         }
         // GET: TestAccRecords/Details/5

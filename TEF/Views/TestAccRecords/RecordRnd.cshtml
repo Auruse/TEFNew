@@ -5,9 +5,9 @@
     Layout = "~/Views/Shared/_Layout.cshtml";}
 
 
-@if (Model != null)
+@if (Model!=null)
 {
-    int cur = Model.Id * 100 / ViewBag.MaxQ;
+    int cur = (Model.Id-1) * 100 / ViewBag.MaxQ;
     int prg = Convert.ToInt16(ViewBag.Score) *100/ ViewBag.MaxQ;
     <div class="container text-center">
         <div class="alert alert-success text-center" role="alert">
@@ -34,6 +34,8 @@
                     <input name="MaxQ" value="@ViewBag.MaxQ" type="hidden" />
                     <input name="SubjectId" value="@ViewBag.SubjectId" type="hidden" />
                     <input name="Subject" value="@ViewBag.Subject" type="hidden" />
+                    <input name="CurrQ" value="@ViewBag.CurrQ" type="hidden" />
+                    <input name="AnsweredCorrectly" value="@ViewBag.AnsweredCorrectly" type="hidden" />
                     <div class="container text-left">
                         @{
 
